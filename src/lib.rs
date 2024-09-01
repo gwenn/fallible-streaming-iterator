@@ -894,6 +894,6 @@ where
 mod test {
     use super::*;
 
-    fn _is_object_safe(_: &FallibleStreamingIterator<Item = (), Error = ()>) {}
-    fn _is_object_safe_double(_: &DoubleEndedFallibleStreamingIterator<Item = (), Error = ()>) {}
+    fn _is_object_safe(_: &dyn FallibleStreamingIterator<Item = (), Error = ()>) {}
+    fn _is_object_safe_double(_: &dyn DoubleEndedFallibleStreamingIterator<Item = (), Error = ()>) {}
 }
