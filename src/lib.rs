@@ -103,7 +103,7 @@ pub trait FallibleStreamingIterator {
         Self: Sized,
     {
         let mut count = 0;
-        while let Some(_) = self.next()? {
+        while (self.next()?).is_some() {
             count += 1;
         }
         Ok(count)
@@ -116,7 +116,7 @@ pub trait FallibleStreamingIterator {
         Self: Sized,
         F: FnMut(&Self::Item) -> bool,
     {
-        Filter { it: self, f: f }
+        Filter { it: self, f }
     }
 
     /// Returns the first element of the iterator which satisfies a predicate.
@@ -174,7 +174,7 @@ pub trait FallibleStreamingIterator {
     {
         Map {
             it: self,
-            f: f,
+            f,
             value: None,
         }
     }
@@ -189,7 +189,7 @@ pub trait FallibleStreamingIterator {
         Self: Sized,
         F: Fn(&Self::Item) -> &B,
     {
-        MapRef { it: self, f: f }
+        MapRef { it: self, f }
     }
 
     /// Returns an iterator that applies a transform to errors.
@@ -199,7 +199,7 @@ pub trait FallibleStreamingIterator {
         Self: Sized,
         F: Fn(Self::Error) -> B,
     {
-        MapErr { it: self, f: f }
+        MapErr { it: self, f }
     }
 
     /// Returns the `nth` element of the iterator.
@@ -207,7 +207,7 @@ pub trait FallibleStreamingIterator {
     fn nth(&mut self, n: usize) -> Result<Option<&Self::Item>, Self::Error> {
         for _ in 0..n {
             self.advance()?;
-            if let None = self.get() {
+            if self.get().is_none() {
                 return Ok(None);
             }
         }
@@ -237,7 +237,7 @@ pub trait FallibleStreamingIterator {
     where
         Self: Sized,
     {
-        Skip { it: self, n: n }
+        Skip { it: self, n }
     }
 
     /// Returns an iterator which skips the first sequence of elements matching a predicate.
@@ -249,7 +249,7 @@ pub trait FallibleStreamingIterator {
     {
         SkipWhile {
             it: self,
-            f: f,
+            f,
             done: false,
         }
     }
@@ -262,7 +262,7 @@ pub trait FallibleStreamingIterator {
     {
         Take {
             it: self,
-            n: n,
+            n,
             done: false,
         }
     }
@@ -276,7 +276,7 @@ pub trait FallibleStreamingIterator {
     {
         TakeWhile {
             it: self,
-            f: f,
+            f,
             done: false,
         }
     }
@@ -366,7 +366,7 @@ pub fn convert<'a, I, T, E>(it: I) -> Convert<'a, I, T>
 where
     I: Iterator<Item = Result<&'a T, E>>,
 {
-    Convert { it: it, item: None }
+    Convert { it, item: None }
 }
 
 /// An iterator which wraps a normal `Iterator`.
@@ -732,7 +732,7 @@ where
     #[inline]
     fn advance(&mut self) -> Result<(), I::Error> {
         for _ in 0..self.n {
-            if let None = self.it.next()? {
+            if (self.it.next()?).is_none() {
                 return Ok(());
             }
         }
