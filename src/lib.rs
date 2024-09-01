@@ -839,7 +839,7 @@ where
 
         let upper = match upper {
             Some(x) if x < self.n => Some(x),
-            _ => Some(self.n)
+            _ => Some(self.n),
         };
 
         (lower, upper)
@@ -895,5 +895,6 @@ mod test {
     use super::*;
 
     fn _is_object_safe(_: &dyn FallibleStreamingIterator<Item = (), Error = ()>) {}
-    fn _is_object_safe_double(_: &dyn DoubleEndedFallibleStreamingIterator<Item = (), Error = ()>) {}
+    fn _is_object_safe_double(_: &dyn DoubleEndedFallibleStreamingIterator<Item = (), Error = ()>) {
+    }
 }
